@@ -20,10 +20,12 @@ export const createUserZodSchema = z.object({
             { message: "Password must contain at least 1 special character" })
         .regex(/^(?=.*\d)/,
             { message: "Password must contain at least 1 number." }),
-    phone: z
-        .string({ invalid_type_error: "Phone number must be string" })
-        .regex(/^(?:\+8801\d{9})$/,
-            { message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX" })
+    phone: z.string({
+        invalid_type_error: "Phone number must be string",
+    })
+        .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
+            message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX"
+        })
         .optional(),
     address: z
         .string({ invalid_type_error: "Address must be string." })
