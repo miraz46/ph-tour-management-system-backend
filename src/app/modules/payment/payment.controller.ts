@@ -7,7 +7,6 @@ import { PaymentService } from "./payment.service";
 
 const initPayment = catchAsync(async (req: Request, res: Response) => {
     const bookingId = req.params.bookingId;
-    console.log(bookingId);
     const result = await PaymentService.initPayment(bookingId as string)
     sendResponse(res, {
         statusCode: 201,
