@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
@@ -21,6 +20,7 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(cookieParser())
 

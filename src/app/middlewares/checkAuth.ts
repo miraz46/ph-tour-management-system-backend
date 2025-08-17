@@ -21,12 +21,16 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
         if (!isUserExist) {
             throw new AppError(httpStatus.BAD_REQUEST, "User does not exist.")
         }
+        if (!isUserExist.isVerified) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User is not Verified.")
+        }
         if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
             throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
         }
         if (isUserExist.isDeleted) {
             throw new AppError(httpStatus.BAD_REQUEST, "User is deleted.")
         }
+
         if (!authRoles.includes(verifiedToken.role)) {
             throw new AppError(403, "You are not permitted to view this route!!")
         }
