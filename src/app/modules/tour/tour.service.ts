@@ -1,3 +1,4 @@
+import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 import { QueryBuilder } from "../../utils/QueryBuilder";
 import { tourSearchableFields } from "./tour.constant";
 import { ITour, ITourType } from "./tour.interface";
@@ -129,21 +130,28 @@ const updateTour = async (id: string, payload: Partial<ITour>) => {
     if (!existingTour) {
         throw new Error("Tour not found.");
     }
+    
+    if (payload.images && payload.images.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        payload.images = [...payload.images, ...existingTour.images]
+    }
 
-    // if (payload.title) {
-    //     const baseSlug = payload.title.toLowerCase().split(" ").join("-")
-    //     let slug = `${baseSlug}`
+    if (payload.deleteImages && payload.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) {
 
-    //     let counter = 0;
-    //     while (await Tour.exists({ slug })) {
-    //         slug = `${slug}-${counter++}` // dhaka-division-2
-    //     }
+        const restDBImages = existingTour.images.filter(imageUrl => !payload.deleteImages?.includes(imageUrl))
 
-    //     payload.slug = slug
-    // }
+        const updatedPayloadImages = (payload.images || [])
+            .filter(imageUrl => !payload.deleteImages?.includes(imageUrl))
+            .filter(imageUrl => !restDBImages.includes(imageUrl))
+
+        payload.images = [...restDBImages, ...updatedPayloadImages]
+
+    }
 
     const updatedTour = await Tour.findByIdAndUpdate(id, payload, { new: true });
 
+    if (payload.deleteImages && payload.deleteImages.length > 0 && existingTour.images && existingTour.images.length > 0) {
+        await Promise.all(payload.deleteImages.map(url => deleteImageFromCLoudinary(url)))
+    }
     return updatedTour;
 };
 
